@@ -29,7 +29,7 @@ void AM2320::wakeUp() {
 
 Conditions AM2320::getConditions() {
     if ( !processSensorResponse()) {
-        return conditions;
+        return Conditions(-1, -1);
     }
     return conditions;
 }
@@ -64,14 +64,20 @@ bool AM2320::processSensorResponse() {
         return false;
     }
 
-    uint16_t receivedCrc = ((sensorResponse[7] << 8) | sensorResponse[6]);
+    uint16_t receivedCrc = ((sensorResponse[(int) ResponseBytes::CRC_HIGH_BYTE] << 8) 
+        | sensorResponse[(int) ResponseBytes::CRC_LOW_BYTE]);
 
-    if (receivedCrc == crc16(sensorResponse, 6)) {
-        uint16_t hum = (sensorResponse[2] << 8) | sensorResponse[3];
+    uint8_t responseBytesNumber = 6;
+    if (receivedCrc == crc16(sensorResponse, responseBytesNumber)) {
+        
+        uint16_t hum = (sensorResponse[(int) ResponseBytes::HUMIDITY_HIGH_BYTE] << 8) 
+            | sensorResponse[(int) ResponseBytes::HUMIDITY_LOW_BYTE];
         conditions.humidity = hum / 10.0;
 
-        uint16_t temp = (sensorResponse[4] << 8) | sensorResponse[5];
-        if ((sensorResponse[4] & 0x80) >> 7 == 1) {
+        uint16_t temp = (sensorResponse[(int) ResponseBytes::TEMPERATURE_HIGH_BYTE] << 8) 
+            | sensorResponse[(int) ResponseBytes::TEMPERATURE_LOW_BYTE];
+
+        if ((sensorResponse[(int) ResponseBytes::TEMPERATURE_HIGH_BYTE] & 0x80) >> 7 == 1) {
             conditions.temperature = -1 * temp / 10.0;
         } else {
             conditions.temperature = temp / 10.0;
