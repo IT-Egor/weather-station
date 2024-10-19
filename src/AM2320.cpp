@@ -87,7 +87,6 @@ bool AM2320::processSensorResponse() {
 
 unsigned short AM2320::crc16(unsigned char *ptr, unsigned char len) {
     unsigned short crc = 0xFFFF;
-    unsigned char i;
     while (len--) {
         crc ^= *ptr++;
         for (int i = 0; i < 8; i++) {
