@@ -1,5 +1,6 @@
 #include "Arduino.h"
 #include "Conditions.h"
+#include "Utility.h"
 
 class AM2320 {
 private:
@@ -7,6 +8,7 @@ private:
     byte sensorResponse[maxResponseLength];
     Conditions conditions;
     uint8_t i2cAddress;
+    Status status;
 
     bool readSensor();
     bool processSensorResponse();
@@ -18,15 +20,5 @@ public:
     bool initialize(uint8_t i2cAddress);
     Conditions getConditions();
     float getTemperature();
-
-    enum class ResponseBytes : int {
-        FUNCTION_CODE = 0,
-        NUMBER_OF_BYTES = 1,
-        HUMIDITY_HIGH_BYTE = 2,
-        HUMIDITY_LOW_BYTE = 3,
-        TEMPERATURE_HIGH_BYTE = 4,
-        TEMPERATURE_LOW_BYTE = 5,
-        CRC_LOW_BYTE = 6,
-        CRC_HIGH_BYTE = 7,
-    };
+    Status getStatus();
 };

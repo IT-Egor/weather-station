@@ -14,10 +14,10 @@ bool AM2320::initialize(uint8_t i2cAddress) {
     uint8_t status = Wire.endTransmission();
     if (status == 0) {
         this->i2cAddress = i2cAddress;
-        Serial.println("AM2320: initialized");
+        this->status = Status::INITIALIZED;
         return true;
     } else {
-        Serial.println("AM2320: initialize failed");
+        this->status = Status::INITIALIZE_FAILED;
         return false;
     }
 }
@@ -38,20 +38,24 @@ bool AM2320::readSensor() {
     wakeUp();
 
     uint8_t startAddress = 0x00;
-    uint8_t numByte = 4;
+    uint8_t writeAddress = 0x03;
+    uint8_t writeBytes = 4;
     Wire.beginTransmission(i2cAddress);
-    Wire.write(0x03);
+    Wire.write(writeAddress);
     Wire.write(startAddress);
-    Wire.write(numByte); 
+    Wire.write(writeBytes); 
 
     if (Wire.endTransmission(true) != 0) { 
-        Serial.println("AM2320: sensor not ready");
+        status = Status::SENSOR_NOT_READY;
         return false;
     }
-    delayMicroseconds(1500);                    
-    Wire.requestFrom(i2cAddress, numByte + 4); 
 
-    for (int i = 0; i < numByte + 4; i++) {
+    delayMicroseconds(1500); 
+
+    uint8_t requestByteNumber = 8;
+    Wire.requestFrom(i2cAddress, requestByteNumber); 
+
+    for (int i = 0; i < requestByteNumber + 4; i++) {
         sensorResponse[i] = Wire.read();
     }
 
@@ -60,7 +64,7 @@ bool AM2320::readSensor() {
 
 bool AM2320::processSensorResponse() {
     if ( !readSensor()) {
-        Serial.println("AM2320: read error");
+        status = Status::READ_ERROR;
         return false;
     }
 
@@ -69,7 +73,7 @@ bool AM2320::processSensorResponse() {
 
     uint8_t responseBytesNumber = 6;
     if (receivedCrc == crc16(sensorResponse, responseBytesNumber)) {
-        
+
         uint16_t hum = (sensorResponse[(int) ResponseBytes::HUMIDITY_HIGH_BYTE] << 8) 
             | sensorResponse[(int) ResponseBytes::HUMIDITY_LOW_BYTE];
         conditions.humidity = hum / 10.0;
@@ -82,13 +86,17 @@ bool AM2320::processSensorResponse() {
         } else {
             conditions.temperature = temp / 10.0;
         }
-
+        status = Status::OK;
         return true;
     }
     else {
-        Serial.println("AM2320: crc error");
+        status = Status::CRC_MISMATCH;
         return false;
     }
+}
+
+Status AM2320::getStatus() {
+    return status;
 }
 
 unsigned short AM2320::crc16(unsigned char *ptr, unsigned char len) {
