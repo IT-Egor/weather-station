@@ -55,4 +55,7 @@ void blinking(bool on) {
 		blinkTimer = millis();
 		digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
 	}
+	if (!on) {
+		digitalWrite(LED_BUILTIN, LOW);
+	}
 }
