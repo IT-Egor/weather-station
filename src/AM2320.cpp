@@ -71,7 +71,11 @@ bool AM2320::processSensorResponse() {
         conditions.humidity = hum / 10.0;
 
         uint16_t temp = (sensorResponse[4] << 8) | sensorResponse[5];
-        conditions.temperature = temp / 10.0;
+        if ((sensorResponse[4] & 0x80) >> 7 == 1) {
+            conditions.temperature = -1 * temp / 10.0;
+        } else {
+            conditions.temperature = temp / 10.0;
+        }
 
         return true;
     }
