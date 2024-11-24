@@ -28,7 +28,7 @@ void AM2320::wakeUp() {
 }
 
 Conditions AM2320::getConditions() {
-    if ( !processSensorResponse()) {
+    if (!processSensorResponse()) {
         return Conditions(-1, -1);
     }
     return conditions;
@@ -63,7 +63,7 @@ bool AM2320::readSensor() {
 }
 
 bool AM2320::processSensorResponse() {
-    if ( !readSensor()) {
+    if (!readSensor()) {
         status = Status::READ_ERROR;
         return false;
     }
