@@ -64,15 +64,15 @@
 #include <Arduino.h>
 #include <Flash.h>
 
-const int SSPin = 10;
+const int CSPin = 10;
 
 byte arr[] = {0x18, 0x22, 0xA0, 0xAF, 0x20, 0xA8, 0xFF};
-Flash flash;
+Flash flash(10);
 
 void setup() {
   Serial.begin(115200);
-  pinMode(SSPin, OUTPUT);
-  SPI.begin(); 
+  // pinMode(CSPin, OUTPUT);
+  // SPI.begin(); 
   flash.sectorErase(0); delay(1000);// 0...255 sectors (1sector=4k_byte)
  // block_clean(0);delay(2000);// 0...15 block (1block=64k_byte)
  // chip_clean();delay(20000);

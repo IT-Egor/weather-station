@@ -2,11 +2,13 @@
 #include <Flash.h>
 #include <FlashUtility.h>
 
-const int SSPin = 10;
-
 SPISettings spiSet(500000, MSBFIRST, SPI_MODE0);
 
-Flash::Flash() {}
+Flash::Flash(int CSPin) {
+    this->CSPin = CSPin;
+    pinMode(CSPin, OUTPUT);
+    SPI.begin(); 
+}
 
 byte Flash::read(long addr) {
     byte addr2 = (addr >> 16) & 0xFF;
@@ -14,7 +16,7 @@ byte Flash::read(long addr) {
     byte addr0 = addr & 0x0000FF;
     
     SPI.beginTransaction(spiSet);
-    digitalWrite(SSPin, LOW);
+    digitalWrite(CSPin, LOW);
     SPI.transfer((int) Instructions::READ_DATA);
     SPI.transfer(addr2);
     SPI.transfer(addr1);
@@ -22,7 +24,7 @@ byte Flash::read(long addr) {
 
     byte data = SPI.transfer(0);
     
-    digitalWrite(SSPin, HIGH);
+    digitalWrite(CSPin, HIGH);
     SPI.endTransaction();
 
     return data;
@@ -36,7 +38,7 @@ void Flash::write(long addr, byte data) {
     byte addr0 = addr & 0x0000FF;
 
     SPI.beginTransaction(spiSet);
-    digitalWrite(SSPin, LOW);
+    digitalWrite(CSPin, LOW);
     SPI.transfer((int) Instructions::PAGE_PROGRAM);
     SPI.transfer(addr2);
     SPI.transfer(addr1);
@@ -44,7 +46,7 @@ void Flash::write(long addr, byte data) {
 
     SPI.transfer(data);
 
-    digitalWrite(SSPin, HIGH);
+    digitalWrite(CSPin, HIGH);
     SPI.endTransaction();
     spiWriteEnable(false);
 }
@@ -67,26 +69,26 @@ void Flash::chipErase() {
     spiWriteEnable(false);
 } 
 
-///////////////////////////////////////////////////////////////////////
+//-------------------------private--------------------------
 void Flash::spiWriteEnable(bool enable) {
     SPI.beginTransaction(spiSet);
-    digitalWrite(SSPin, LOW);
+    digitalWrite(CSPin, LOW);
     if (enable) {
         SPI.transfer((int) Instructions::WRITE_ENABLE);
     } else {
         SPI.transfer((int) Instructions::WRITE_DISABLE);
     }
-    digitalWrite(SSPin, HIGH);
+    digitalWrite(CSPin, HIGH);
     SPI.endTransaction();
 }  
 
  void Flash::spiCommand(byte command, byte addr){
     SPI.beginTransaction(spiSet);
-    digitalWrite(SSPin, LOW);
+    digitalWrite(CSPin, LOW);
     SPI.transfer(command);
     SPI.transfer(0);
     SPI.transfer(0);
     SPI.transfer(addr);
-    digitalWrite(SSPin, HIGH);
+    digitalWrite(CSPin, HIGH);
     SPI.endTransaction();
 }       
