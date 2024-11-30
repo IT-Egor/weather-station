@@ -5,10 +5,10 @@
 
 class DataInterface {
 public:
-    DataInterface(int sensorAddres, int flashCSPin);
+    DataInterface();
     bool writeSensorDataToFlash();
     Conditions readSensorDataFromFlash();
-    bool sensorInitialized();
+    bool initialize(int sensorAddres, int flashCSPin);
 private:
     AM2320 sensor;
     Flash flash;

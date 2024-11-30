@@ -1,14 +1,7 @@
 #include <DataInterface.h>
 
-DataInterface::DataInterface(int sensorAddres, int flashCSPin) : flash(flashCSPin) {
-    sensor.initialize(sensorAddres);
-    if (sensor.getStatus() == Status::INITIALIZED) {
-        isSensorInitialized = true;
-    } else {
-        isSensorInitialized = false;
-    }
-    curFlashWriteAddress = 0;
-    curFlashReadAddress = 0;
+DataInterface::DataInterface() {
+    
 }
 
 bool DataInterface::writeSensorDataToFlash() {
@@ -21,7 +14,6 @@ bool DataInterface::writeSensorDataToFlash() {
             curFlashWriteAddress++;
         }
 
-        Serial.println();
         Serial.println("write:");
         for (int i = 0; i < 4; i++) {
             Serial.print((String) data[i] + " ");
@@ -83,6 +75,15 @@ Conditions DataInterface::convertBytesToConditions(uint8_t data[4]) {
     return conditions;
 }
 
-bool DataInterface::sensorInitialized() {
+bool DataInterface::initialize(int sensorAddres, int flashCSPin) {
+    sensor.initialize(sensorAddres);
+    flash.initialize(flashCSPin);
+    if (sensor.getStatus() == Status::INITIALIZED) {
+        isSensorInitialized = true;
+    } else {
+        isSensorInitialized = false;
+    }
+    curFlashWriteAddress = 0;
+    curFlashReadAddress = 0;
     return isSensorInitialized;
 }

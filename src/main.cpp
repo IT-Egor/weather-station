@@ -104,24 +104,36 @@
 #include <Arduino.h>
 #include <DataInterface.h>
 
-// DataInterface di(0x5C, 10);
+// Flash flash(10);
+DataInterface di;
 
 void setup() {
-  Flash flash(10);
-  flash.blockErase(0);
-  DataInterface di(0x5C, 10);
+  Flash flash;
+  flash.initialize(10);
+  flash.chipErase();
+  // DataInterface di(0x5C, 10);
+  di.initialize(0x5C, 10);
   Serial.begin(115200);
   Serial.println("start");
-  Serial.println(di.sensorInitialized());
+  // Serial.println(di.initialize());
 
-  di.writeSensorDataToFlash();
-  Conditions cond = di.readSensorDataFromFlash();
+  // di.writeSensorDataToFlash();
+  // Conditions cond = di.readSensorDataFromFlash();
 
-  Serial.println("test");
-  Serial.println(cond.humidity);
-  Serial.println(cond.temperature);
+  // Serial.println("test");
+  // Serial.println(cond.humidity);
+  // Serial.println(cond.temperature);
 }
 
 void loop() {
+  Serial.println("------------------------------------");
+  di.writeSensorDataToFlash();
+  Conditions cond = di.readSensorDataFromFlash();
 
+  Serial.println();
+  Serial.println("test");
+  Serial.println(cond.humidity);
+  Serial.println(cond.temperature);
+
+  delay(1000);
 }

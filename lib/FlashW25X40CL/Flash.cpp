@@ -4,11 +4,7 @@
 
 SPISettings spiSet(500000, MSBFIRST, SPI_MODE0);
 
-Flash::Flash(int CSPin) {
-    this->CSPin = CSPin;
-    pinMode(CSPin, OUTPUT);
-    SPI.begin(); 
-}
+Flash::Flash() {}
 
 byte Flash::read(long addr) {
     byte addr2 = (addr >> 16) & 0xFF;
@@ -67,10 +63,20 @@ void Flash::blockErase(byte addr) {
 
 void Flash::chipErase() {
     spiWriteEnable(true);
-    spiWriteEnable((int) Instructions::CHIP_ERASE);
+    SPI.beginTransaction(spiSet);
+    digitalWrite(CSPin, LOW);
+    SPI.transfer((int) Instructions::CHIP_ERASE);
+    digitalWrite(CSPin, HIGH);
+    SPI.endTransaction();
     spiWriteEnable(false);
     delay(20000);
 } 
+
+void Flash::initialize(int CSPin) {
+    this->CSPin = CSPin;
+    pinMode(CSPin, OUTPUT);
+    SPI.begin(); 
+}
 
 //-------------------------private--------------------------
 void Flash::spiWriteEnable(bool enable) {
