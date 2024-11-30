@@ -60,41 +60,68 @@
 // 	}
 // }
 
-#include <SPI.h>
+
+
+// #include <SPI.h>
+// #include <Arduino.h>
+// #include <Flash.h>
+
+// const int CSPin = 10;
+
+// byte arr[] = {0x18, 0x22, 0xA0, 0xAF, 0x20, 0xA8, 0xFF};
+// Flash flash(10);
+
+// void setup() {
+//   Serial.begin(115200);
+//   // pinMode(CSPin, OUTPUT);
+//   // SPI.begin(); 
+//   flash.sectorErase(0); delay(1000);// 0...255 sectors (1sector=4k_byte)
+//  // block_clean(0);delay(2000);// 0...15 block (1block=64k_byte)
+//  // chip_clean();delay(20000);
+  
+//   Serial.print("write: ");
+//   for(int i=0; i<7; i++){
+// 	Serial.print(arr[i]);
+// 	Serial.print(" ");
+//   }
+//   Serial.println();
+
+//   for(int i=0; i<7; i++) {
+// 	flash.write(i+400, arr[i]);
+//   }
+// }
+
+// void loop() { 
+//   for(int i=0;i<7;i++) {
+//   	Serial.print(flash.read(i+400), HEX);
+// 	Serial.print(" ");
+//   }
+//   Serial.println();
+
+//   delay(1000); 
+// }
+
 #include <Arduino.h>
-#include <Flash.h>
+#include <DataInterface.h>
 
-const int CSPin = 10;
-
-byte arr[] = {0x18, 0x22, 0xA0, 0xAF, 0x20, 0xA8, 0xFF};
-Flash flash(10);
+// DataInterface di(0x5C, 10);
 
 void setup() {
+  Flash flash(10);
+  flash.blockErase(0);
+  DataInterface di(0x5C, 10);
   Serial.begin(115200);
-  // pinMode(CSPin, OUTPUT);
-  // SPI.begin(); 
-  flash.sectorErase(0); delay(1000);// 0...255 sectors (1sector=4k_byte)
- // block_clean(0);delay(2000);// 0...15 block (1block=64k_byte)
- // chip_clean();delay(20000);
-  
-  Serial.print("write: ");
-  for(int i=0; i<7; i++){
-	Serial.print(arr[i]);
-	Serial.print(" ");
-  }
-  Serial.println();
+  Serial.println("start");
+  Serial.println(di.sensorInitialized());
 
-  for(int i=0; i<7; i++) {
-	flash.write(i+400, arr[i]);
-  }
+  di.writeSensorDataToFlash();
+  Conditions cond = di.readSensorDataFromFlash();
+
+  Serial.println("test");
+  Serial.println(cond.humidity);
+  Serial.println(cond.temperature);
 }
 
-void loop() { 
-  for(int i=0;i<7;i++) {
-  	Serial.print(flash.read(i+400), HEX);
-	Serial.print(" ");
-  }
-  Serial.println();
+void loop() {
 
-  delay(1000); 
 }

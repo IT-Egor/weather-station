@@ -1,3 +1,4 @@
+#pragma once
 struct Conditions {
     float temperature;
     float humidity;

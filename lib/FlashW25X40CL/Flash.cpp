@@ -55,18 +55,21 @@ void Flash::sectorErase(byte addr) {
     spiWriteEnable(true);
     spiCommand((int) Instructions::SECTOR_ERASE, 0);
     spiWriteEnable(false);
+    delay(1000);
 }  
 
 void Flash::blockErase(byte addr) {
     spiWriteEnable(true);
     spiCommand((int) Instructions::BLOCK_ERASE_32, 0);
     spiWriteEnable(false);
+    delay(2000);
 }   
 
 void Flash::chipErase() {
     spiWriteEnable(true);
     spiWriteEnable((int) Instructions::CHIP_ERASE);
     spiWriteEnable(false);
+    delay(20000);
 } 
 
 //-------------------------private--------------------------

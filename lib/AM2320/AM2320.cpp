@@ -55,7 +55,7 @@ bool AM2320::readSensor() {
     uint8_t requestByteNumber = 8;
     Wire.requestFrom(i2cAddress, requestByteNumber); 
 
-    for (int i = 0; i < requestByteNumber + 4; i++) {
+    for (int i = 0; i < requestByteNumber; i++) {
         sensorResponse[i] = Wire.read();
     }
 
