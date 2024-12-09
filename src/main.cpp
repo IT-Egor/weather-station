@@ -103,19 +103,43 @@
 
 #include <Arduino.h>
 #include <DataInterface.h>
+#include <Definitions.h>
 
-// Flash flash(10);
 DataInterface di;
+Conditions cond;
 
 void setup() {
-  Flash flash;
-  flash.initialize(10);
-  flash.chipErase();
-  // DataInterface di(0x5C, 10);
-  di.initialize(0x5C, 10);
   Serial.begin(115200);
   Serial.println("start");
-  // Serial.println(di.initialize());
+
+  while (mode == '?') {
+    if (Serial.available()) {
+      mode = Serial.read();
+      Serial.println("ok");
+      switch(mode) {
+        case '1':
+          Serial.println("read");
+          di.initialize(0x5C, CSPin);
+          break;
+        case '0':
+          Serial.println("write");
+          break;
+        default:
+          Serial.print("Received unknown character: ");
+          Serial.println(mode);
+      }
+    }
+    // Serial.println("wait");
+    // delay(1000);
+  }
+
+  // Flash flash;
+  // flash.initialize(10);
+  // // flash.chipErase();
+  // di.initialize(0x5C, 10);
+  // Serial.begin(115200);
+  // Serial.println("start");
+  // // Serial.println(di.initialize());
 
   // di.writeSensorDataToFlash();
   // Conditions cond = di.readSensorDataFromFlash();
@@ -126,14 +150,23 @@ void setup() {
 }
 
 void loop() {
-  Serial.println("------------------------------------");
-  di.writeSensorDataToFlash();
-  Conditions cond = di.readSensorDataFromFlash();
-
-  Serial.println();
-  Serial.println("test");
-  Serial.println(cond.humidity);
-  Serial.println(cond.temperature);
-
-  delay(1000);
+  // Serial.println("------------------------------------");
+  // // di.writeSensorDataToFlash();
+  // Conditions cond = di.readSensorDataFromFlash();
+  // Serial.println("test");
+  // Serial.println(cond.humidity);
+  // Serial.println(cond.temperature);
+  if (mode == '1') {
+    Serial.println("begin");
+    while (cond.temperature != 0.10 && cond.humidity != 6553.50) {
+      cond = di.readSensorDataFromFlash();
+      Serial.print((String) cond.temperature + ", ");
+      Serial.println(cond.humidity);
+      delay(10);
+      if (cond.temperature == 0.10 && cond.humidity == 6553.50) {
+        Serial.println("end");
+      }
+    }
+    mode = '?';
+  }
 }

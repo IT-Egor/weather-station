@@ -14,11 +14,11 @@ bool DataInterface::writeSensorDataToFlash() {
             curFlashWriteAddress++;
         }
 
-        Serial.println("write:");
-        for (int i = 0; i < 4; i++) {
-            Serial.print((String) data[i] + " ");
-        }
-        Serial.println();
+        // Serial.println("write:");
+        // for (int i = 0; i < 4; i++) {
+        //     Serial.print((String) data[i] + " ");
+        // }
+        // Serial.println();
         delete[] data;
         return true;
     } else {
@@ -32,12 +32,12 @@ Conditions DataInterface::readSensorDataFromFlash() {
         data[i] = flash.read(curFlashReadAddress);
         curFlashReadAddress++;
     }
-    Serial.println();
-    Serial.println("read:");
-    for (int i = 0; i < 4; i++) {
-        Serial.print((String) data[i] + " ");
-    }
-    Serial.println();
+    // Serial.println();
+    // Serial.println("read:");
+    // for (int i = 0; i < 4; i++) {
+    //     Serial.print((String) data[i] + " ");
+    // }
+    // Serial.println();
     return convertBytesToConditions(data);
 }
 
