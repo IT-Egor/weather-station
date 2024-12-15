@@ -1,8 +1,6 @@
 #include <DataInterface.h>
 
-DataInterface::DataInterface() {
-    
-}
+DataInterface::DataInterface() {}
 
 bool DataInterface::writeSensorDataToFlash() {
     Conditions conditions = sensor.getConditions();
@@ -13,12 +11,6 @@ bool DataInterface::writeSensorDataToFlash() {
             flash.write(curFlashWriteAddress, data[i]);
             curFlashWriteAddress++;
         }
-
-        // Serial.println("write:");
-        // for (int i = 0; i < 4; i++) {
-        //     Serial.print((String) data[i] + " ");
-        // }
-        // Serial.println();
         delete[] data;
         return true;
     } else {
@@ -32,12 +24,6 @@ Conditions DataInterface::readSensorDataFromFlash() {
         data[i] = flash.read(curFlashReadAddress);
         curFlashReadAddress++;
     }
-    // Serial.println();
-    // Serial.println("read:");
-    // for (int i = 0; i < 4; i++) {
-    //     Serial.print((String) data[i] + " ");
-    // }
-    // Serial.println();
     return convertBytesToConditions(data);
 }
 
@@ -62,6 +48,11 @@ uint8_t* DataInterface::convertConditionsToBytes(Conditions conditions) {
 
 Conditions DataInterface::convertBytesToConditions(uint8_t data[4]) {
     Conditions conditions;
+
+    if (data[0] == 0xFF && data[1] == 0xFF && data[2] == 0xFF && data[3] == 0xFF) {
+        return conditions;
+    }
+
     uint16_t hum = ((data[0] << 8) | data[1]);
     conditions.humidity = hum / 10.0;
 
