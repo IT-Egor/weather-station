@@ -45,7 +45,6 @@ void loop() {
                 Serial.print((String) cond.temperature + ", ");
                 Serial.println(cond.humidity);
             }
-            delay(10);
         } while (cond.temperature != 0 && cond.humidity != 0);
         Serial.println("end");
         mode = '?';
